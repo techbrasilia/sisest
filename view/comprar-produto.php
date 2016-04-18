@@ -1,5 +1,7 @@
 <?php
-
+//var_dump($this->produto);
+//echo '<br>'.$this->produto->descricao;
+//exit();
 ?>
 <!DOCTYPE html>
 <head>
@@ -73,12 +75,12 @@
 			</div>
 			<div>
 				<input type="hidden" id="idProduto" name="idProduto" 
-					value="<?php echo (isset($produto) ? $produto->getIdProduto() : '');?>" class="input"/>
+					value="<?php echo (isset($this->produto) ? $this->produto->id : '');?>" class="input"/>
 				<div class="col-um">
 					<label for="descricaoProd">Descrição</label>
 				</div>
 				<input type="text" id="descricaoProd" name="descricaoProd" onkeyup="buscarProdutoDesc(this.value);" onkeypress="buscarProduto(this.value);"
-					value="<?php echo (isset($produto) ? $produto->getDescricao() : '');?>" class="input" required="required"/>
+					value="<?php echo (isset($this->produto) ? $this->produto->descricao : '');?>" class="input" required="required"/>
 				<input type="hidden" id="bd_codigo" name="bd_codigo">
 			</div>
 			<div>
@@ -86,33 +88,36 @@
 					<label for="categoriasel">Categoria</label>
 				</div>
 				<input type="text" id="categoriasel" name="categoriasel" readonly="readonly"
-				value="<?php echo (isset($produto) ? $produto->getCategoria() : '');?>" class="input" /> 
+				value="<?php echo (isset($this->produto) ? $this->produto->descricao_cat : '');?>" class="input" /> 
 			
 				<label for="unidade">Unidade</label>
 				<input type="text" id="unidade" name="unidade" readonly="readonly"
-					value="<?php echo (isset($produto) ? $produto->getUnidade() : '');?>" class="input"/>
+					value="<?php echo (isset($this->produto) ? $this->produto->unidade : '');?>" class="input"/>
 			
 				<label for="qtd_em_estoque">Estoque</label>
-				<input type="text" id="qtd_em_estoque" name="qtd_em_estoque" class="input" readonly="readonly"/>
-				Mín.<input type="text" id="estoqueMinimo" name="estoqueMinimo" class="input" readonly="readonly"/>
-				Máx.<input type="text" id="estoqueMaximo" name="estoqueMaximo" class="input" readonly="readonly"/>
+				<input type="text" id="qtd_em_estoque" name="qtd_em_estoque" class="input" readonly="readonly" 
+				value="<?php echo (isset($this->produto) ? $this->produto->qtd_em_estoque : '');?>" />
+				Mín.<input type="text" id="estoqueMinimo" name="estoqueMinimo" class="input" readonly="readonly" 
+				value="<?php echo (isset($this->produto) ? $this->produto->estoque_minimo : '');?>" />
+				Máx.<input type="text" id="estoqueMaximo" name="estoqueMaximo" class="input" readonly="readonly" 
+				value="<?php echo (isset($this->produto) ? $this->produto->estoque_maximo : '');?>" />
 			</div>
 			<div>
 				<label for="quantidade">Quantidade</label>
 				<input type="text" id="quantidade" name="quantidade"  
-					value="<?php echo (isset($produto) ? $produto->getQuantidade() : '');?>" class="input"/>
+					value="" class="input"/>
 			
 				<label for="valorproduto">Valor Unitário</label>
 				<input type="text" id="valorproduto" name="valorproduto"  
-					value="<?php echo (isset($produto) ? $produto->getValorUnit() : '');?>" class="input"/>
+					value="<?php echo (isset($this->produto) ? $this->produto->valor_unitario : '');?>" class="input"/>
 					
 				<label for="percVenda">Percentual de Venda</label>
 				<input type="text" id="percVenda" name="percVenda" onkeyup="calcularPerc(this.value)" 
-					value="<?php echo (isset($produto) ? $produto->getPercVenda() : '');?>" class="input"/>
+					value="" class="input"/>
 					
 				<label for="valorVenda">Valor de Venda</label>
 				<input type="text" id="valorVenda" name="valorVenda"  
-					value="<?php echo (isset($produto) ? $produto->getValorVenda() : '');?>" class="input"/>
+					value="" class="input"/>
 			</div>
 			
 			<div id="div_fornecedor">
@@ -129,8 +134,8 @@
 			<div>
 				<div class="col-um">
 					<label for="checkNovoFornecedor">Novo Fornecedor</label>
+					<input type="checkbox" id="checkNovoFornecedor" name="checkNovoFornecedor" value="" />
 				</div>
-				<input type="checkbox" id="checkNovoFornecedor" name="checkNovoFornecedor" value="" />
 			</div>
 			
 			<div>
@@ -138,7 +143,7 @@
 					<label for="statusProdudo">Status</label>
 				</div>
 				<input type="text" id="statusProdudo" name="statusProdudo"  readonly="readonly"
-					value="<?php echo (isset($produto) ? $produto->getStatus() : '');?>" class="input"/>
+					value="<?php echo (isset($this->produto) && $this->produto->status == 'A' ? 'ATIVO' : '');?>" class="input"/>
 			</div>
 			<div>
 				<input type="submit" id="salvarEProduto" name="salvarEProduto" value="Confirmar" class="input"/>

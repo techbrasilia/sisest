@@ -72,7 +72,7 @@
 				<div class="col-um">
 					<label for="descricaoProd">Descrição</label>
 				</div>
-				<input type="text" id="descricaoProd" name="descricaoProd" onkeypress="buscarProdutoDesc(this.value);" onkeyup="buscarProduto(this.value);"
+				<input type="text" id="descricaoProd" name="descricaoProd" 
 					value="<?php echo (isset($this->produto) ? $this->produto->descricao : '');?>" class="input"/>
 			</div>
 			<div>

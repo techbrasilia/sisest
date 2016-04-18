@@ -71,23 +71,26 @@
 					<th>Descrição</th>
 					<th>Categoria</th>
 					<th>Unid.</th>
+					<th>Estoque</th>
 					<th>Est. Min</th>
 					<th>Est. Max</th>
-					<th>Qtd em Estoque</th>
 					<th>Valor</th>
-					<th></th>
+					<th colspan="3">Ações</th>
 				</thead>
 				<tbody>
 		<?php foreach( $this->getProdutos() as $row ): ?>
 			<tr>
-				<td><?php echo $row['codigo'];?></td>
+				<td><?php echo $row['id'];?></td>
 				<td><?php echo $row['descricao'];?></td>
 				<td><?php echo $row['categoria'];?></td>
 				<td><?php echo $row['unidade'];?></td>
+				<td><?php echo $row['qtd_em_estoque'];?></td>
 				<td><?php echo $row['estoque_minimo'];?></td>
 				<td><?php echo $row['estoque_maximo'];?></td>
-				<td><?php echo $row['qtd_em_estoque'];?></td>
 				<td><?php echo $row['valor'];?></td>
+				<td><a href="index.php?cod=comprar-produto&id_produto=<?php echo $row['id'];?>" title="Comprar">C</a></td>
+				<td><a href="index.php?cod=alterar-produto&id_produto=<?php echo $row['id'];?>" title="Alterar">A</a></td>
+				<td><a href="index.php?cod=excluir-produto&id_produto=<?php echo $row['id'];?>" title="Excluir">X</a></td>
 			</tr>
 		<?php 
 			endforeach;

@@ -28,7 +28,14 @@ class EstoqueDAO{
 							left join categoria as cat on ( cat.id = prod.categoria ) 
 							left join unidade as un on ( un.id = prod.unidade ) 
 							where 1=1 
-							group by prod.id, ent.codigo  ";
+							group by prod.id, ent.codigo ";
+	
+	protected $sqlListProdutos = "SELECT prod.id, prod.status, prod.descricao, prod.categoria, prod.unidade, prod.estoque_minimo, 
+								prod.estoque_maximo, est.qtde as qtd_em_estoque, prod.valor 
+								from produto as prod   
+								left join estoque as est on ( est.id_produto = prod.id ) 
+								where 1=1 
+								group by prod.id ";
 							
 	public function insertDados(){
 		$sql = sprintf($this->sqlInsert, '',$this->getHotel(), $this->getNome(), $this->getCpf(), $this->getPassaporte(), 
@@ -56,7 +63,7 @@ class EstoqueDAO{
 	
 	public function selectDadosList($where=null,  $start=null, $end=null, $order=null){
 		$start != null ? $start = 'LIMIT ' : '';
-		$sql = sprintf($this->sqlSelectList, $where,  $start, $end, $order );
+		$sql = sprintf($this->sqlListProdutos, $where,  $start, $end, $order );
 		return $this->conexao->RunSelect(trim($sql));
 	}
 	

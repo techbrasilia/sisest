@@ -18,7 +18,21 @@ class EntradaProdutoDAO extends EntradaProdutoVO{
 	protected $sqlUpdate = " UPDATE multiplus SET hotel = '%s', SET nome = '%s', SET cpf = '%s', SET passaporte = '%s', 
 								SET reserva = '%s', SET multiplus = '%s', SET observacao = '%s' WHERE id = '%s' ";
 	protected $sqlUpdateProd = " UPDATE produto SET valor = '%s' WHERE id = '%s' ;";
-							
+
+	protected $sqlSelectEnt = "SELECT prod.id, ent.codigo, ent.perc_venda, ent.valor_venda as valor_unitario, 
+							prod.status, prod.descricao, un.descricao as unidade, 
+							prod.estoque_minimo, prod.estoque_maximo, 
+							cat.id as idcategoria, 
+							cat.descricao_cat, 
+							forn.nome, 
+                            est.qtde as qtd_em_estoque  
+							FROM entrada_produto ent 
+                            right join produto as prod on ( ent.id_produto = prod.id ) 
+							inner join categoria as cat  on ( cat.id = prod.categoria ) 
+							left join fornecedor as forn on ( forn.id = ent.fornecedor ) 
+							left join unidade as un on ( un.id = prod.unidade ) 
+							left join estoque as est on ( est.id_produto =  ent.id_produto )
+							WHERE 1=1 %s %s %s %s order by ent.id desc limit 1 ";
 
 	public function salvarEntradaProduto(){
 
@@ -50,21 +64,30 @@ class EntradaProdutoDAO extends EntradaProdutoVO{
 		return $this->conexao->RunSelect(trim($sql));
 	}
 	
+	public function selectDadosEnt($where=null,  $start=null, $end=null, $order=null){
+		$where = $this->load();
+		$start != null ? $start = 'LIMIT ' : '';
+		$sql = sprintf($this->sqlSelectEnt, $where,  $start, $end, $order );
+		//var_dump($sql);
+ 		//echo $sql;//exit();
+// var_dump($this->conexao);
+		return $this->conexao->RunSelectObject(trim($sql));
+	}
+	
+	
 	public function load(){
 		$where = '';
-		$this->getIdProduto() != null ? $where .= " AND id = '".$this->getIdProduto()."'" : "";
-		$this->getCodigoBarras() != null ? $where .= " AND codigo = ".$this->getCodigoBarras() : "";
-		$this->getDescricao() != null ? $where .= " AND descricao = '".$this->getDescricao()."'" : "";
-		$this->getCategoria() != null ? $where .= " AND categoria = '".$this->getCategoria()."'" : "";
-		$this->getUnidade() != null ? $where .= " AND unidade = '".$this->getUnidade()."'" : "";
-		$this->getEstoqueMinimo() != null ? $where .= " AND estoque_minimo = ".$this->getEstoqueMinimo() : "";
-		$this->getEstoqueMaximo() != null ? $where .= " AND estoque_maximo = ".$this->getEstoqueMaximo() : "";
-		$this->getValorUnit() != null ? $where .= " AND valor = ".$this->getValorUnit() : "";
-		$this->getFornecedor() != null ? $where .= " AND fornecedor = ".$this->getFornecedor() : "";
-		$this->getDataEntrada() != null ? $where .= " AND datacadastro = '".$this->getDataEntrada()."'" : "";
-		$this->getStatus() != null ? $where .= " AND status = '".$this->getStatus()."'" : "";
-// 		echo var_dump($this);exit();
-// 		$this->selectDados($where);
+		$this->getIdProduto() != null ? $where .= " AND prod.id = '".$this->getIdProduto()."'" : "";
+		$this->getCodigoBarras() != null ? $where .= " AND ent.codigo = ".$this->getCodigoBarras() : "";
+		$this->getDescricao() != null ? $where .= " AND prod.descricao like '%".$this->getDescricao()."%'" : "";
+		$this->getCategoria() != null ? $where .= " AND prod.categoria = '".$this->getCategoria()."'" : "";
+		$this->getUnidade() != null ? $where .= " AND prod.unidade = '".$this->getUnidade()."'" : "";
+		$this->getEstoqueMinimo() != null ? $where .= " AND prod.estoque_minimo = ".$this->getEstoqueMinimo() : "";
+		$this->getEstoqueMaximo() != null ? $where .= " AND prod.estoque_maximo = ".$this->getEstoqueMaximo() : "";
+		$this->getValorUnit() != null ? $where .= " AND prod.valor = ".$this->getValorUnit() : "";
+		$this->getFornecedor() != null ? $where .= " AND prod.fornecedor = ".$this->getFornecedor() : "";
+		$this->getDataEntrada() != null ? $where .= " AND prod.datacadastro = '".$this->getDataEntrada()."'" : "";
+		$this->getStatus() != null ? $where .= " AND prod.status = '".$this->getStatus()."'" : "";
 		return $where;
 	}
 	

@@ -29,7 +29,7 @@ class ProdutoDAO extends ProdutoVO{
 							WHERE 1=1 %s %s %s %s ";
 							
 	protected $sqlSelectEnt = "SELECT prod.id, ent.codigo, ent.perc_venda, ent.valor_venda as valor_unitario, 
-							prod.status, prod.descricao, un.descricao as unidade, 
+							prod.status, prod.descricao, prod.unidade as id_unidade, un.descricao as unidade, 
 							prod.estoque_minimo, prod.estoque_maximo, 
 							cat.id as idcategoria, 
 							cat.descricao_cat, 
@@ -48,9 +48,16 @@ class ProdutoDAO extends ProdutoVO{
 								left join produto as prod  on ( ent.id_produto = prod.id ) 
 								left join estoque as est on ( est.id_produto = prod.id ) where 1=1 
 								group by prod.id, ent.codigo  ";
+
+	protected $sqlListProdutos = "SELECT prod.id, prod.status, prod.descricao, prod.categoria, prod.unidade, prod.estoque_minimo, 
+								prod.estoque_maximo, est.qtde as qtd_em_estoque 
+								from produto as prod   
+								left join estoque as est on ( est.id_produto = prod.id ) 
+								where 1=1 
+								group by prod.id ";
 								
-	protected $sqlUpdate = "UPDATE multiplus SET hotel = '%s', SET nome = '%s', SET cpf = '%s', SET passaporte = '%s', 
-								SET reserva = '%s', SET multiplus = '%s', SET observacao = '%s' WHERE id = '%s' ";
+	protected $sqlUpdate = "UPDATE produto SET status = '%s', descricao = '%s', categoria = %s, unidade = %s, estoque_minimo = %s, 
+							estoque_maximo = %s WHERE id = %s ";
 
 	public function salvarProduto(){
 
@@ -61,9 +68,11 @@ class ProdutoDAO extends ProdutoVO{
 		return $this->conexao->RunQuery($sql);
 	}
 	
-	public function updateDados(){
-		$sql = sprintf($this->sqlUpdate, $this->getHotel(), $this->getNome(), $this->getCpf(), $this->getPassaporte(), 
-										$this->getReserva(), $this->getMultiplus(), $this->getObservacao(), $this->getId() );
+	public function atualizarProduto(){
+		$sql = sprintf($this->sqlUpdate, $this->getStatus(), $this->getDescricao(), $this->getCategoria(), $this->getUnidade(), 
+										$this->getEstoqueMinimo(), $this->getEstoqueMaximo(), $this->getIdProduto() );
+
+		//echo $sql;exit();					
 		return $this->conexao->RunQuery($sql);
 	}
 	
@@ -96,6 +105,16 @@ class ProdutoDAO extends ProdutoVO{
  		//echo $sql;//exit();
 // var_dump($this->conexao);
 		return $this->conexao->RunSelect(trim($sql));
+	}
+	
+	public function selectObjProd($where=null,  $start=null, $end=null, $order=null){
+		$where = $this->load();
+		$start != null ? $start = 'LIMIT ' : '';
+		$sql = sprintf($this->sqlSelectEnt, $where,  $start, $end, $order );
+		//var_dump($sql);
+ 		//echo $sql;//exit();
+// var_dump($this->conexao);
+		return $this->conexao->RunSelectObject(trim($sql));
 	}
 	
 	public function load(){
