@@ -54,6 +54,10 @@ class IndexCTRL {
 				return $this->controlador = new ProdutoCTRL($this->cod, $this->acao);
 				break;
 			
+			case $this->cod = 'alterar-produto':
+				return $this->controlador = new ProdutoCTRL($this->cod, $this->acao);
+				break;
+			
 			case $this->cod = 'comprar-produto':
 				return $this->controlador = new EntradaProdutoCTRL($this->cod, $this->acao);
 				break;

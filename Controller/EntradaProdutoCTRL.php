@@ -2,6 +2,7 @@
 namespace Controller;
 
 use Model\EntradaProdutoDAO;
+use Model\ProdutoDAO;
 use Model\FornecedorDAO;
 use Classes\Funcoes;
 class EntradaProdutoCTRL {
@@ -12,6 +13,7 @@ class EntradaProdutoCTRL {
 	private $msg;
 	private $funcao;
 	private $fornecedor;
+	private $produto;
 			
 	public function __construct($pag, $acao){
 		$this->pag = $pag;
@@ -21,6 +23,14 @@ class EntradaProdutoCTRL {
 		
 		if( $acao != null ){
 			return $this->action();
+		
+		}else if( isset($_GET['id_produto']) ){
+			
+			$f = new FornecedorDAO();
+			$this->setFornecedor($f->selectDados());
+			$this->buscarProdutoPorCodigo();
+			require_once (WWW_ROOT.DS.'view\/'.$this->pag.'.php');
+			exit();
 			
 		}else{
 			$f = new FornecedorDAO();
@@ -95,43 +105,20 @@ class EntradaProdutoCTRL {
 		
 	}
 	
-	/*public function buscarProdutoPorCodigo(){
-		$dados = array();
-		$produto = new ProdutoDAO();
-		$produto->setCodigoBarras($_REQUEST['codigo']);
-		$res = $produto->selectDados();
-// 		var_dump($res);exit();
-		if( count($res) > 0 ){
-			foreach( $res as $key => $row ) {
+	public function buscarProdutoPorCodigo(){
 	
-				$dados['Produto'][$key] = $row;
-			}
+		$res = new ProdutoDAO();
+		//$res = array();
+		
+		if( isset($_GET['id_produto']) ){
 			
-			echo json_encode($dados);
-		}else{
-			$dados['Produto'] = 0;
-			echo json_encode($dados);
+			$res->setIdProduto(trim($_GET['id_produto']));
+			return $this->produto = $res->selectObjProd();
+			
 		}
-		exit();
-	}*/
 	
-	/*private function verificarProduto($produto){
-		$prod = $produto;
-		$prod->setCodigoBarras(null);
-		$prod->setUnidade(null);
-		$prod->setEstoqueMinimo(null);
-		$prod->setEstoqueMaximo(null);
-		$prod->setValorUnit(null);
-		$prod->setDataEntrada(null);
-		$prod->setIdProduto(null);
-		$res = $prod->selectDados();
-		if( count($res) > 0 ){
-			$this->setMsg("Produto já existente!");
-			require_once (WWW_ROOT.DS.'view\/'.$this->pag.'.php');
-			exit();
-		}
-	}*/
-	
+	}
+
 	public function getTitulo(){
 		return $this->titulo;
 	}
@@ -154,6 +141,14 @@ class EntradaProdutoCTRL {
 	
 	public function setFornecedor($fornecedor){
 		$this->fornecedor = $fornecedor;
+	}
+	
+	public function getProduto(){
+		return $this->produto;
+	}
+	
+	public function setProduto($produto){
+		$this->produto = $produto;
 	}
 	
 }

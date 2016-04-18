@@ -16,36 +16,41 @@ class ProdutoCTRL {
 	private $fornecedor;
 	private $categoria;
 	private $unidade;
-		
+	private $produto;
+	
 	public function __construct($pag, $acao){
 		$this->pag = $pag;
 		$this->acao = $acao;
 		$this->funcao = new Funcoes();
 		$this->setTitulo("Página de Cadastro de Produtos");
+		$c = new CategoriaDAO();
+		$this->setCategoria($c->selectDados());
 		
+		$f = new FornecedorDAO();
+		$this->setFornecedor($f->selectDados());
+		
+		$u = new UnidadeDAO();
+		$this->setUnidade($u->selectDados());
 		
 		if( $acao != null ){
 			return $this->action();
+		
+		}else if( isset($_GET['id_produto']) ){
+			$this->setTitulo("Página de Cadastro de Produtos - Alterar");
+			$this->buscarProdutoPorCodigo();
+			require_once (WWW_ROOT.DS.'view\/'.$this->pag.'.php');
+			exit();
 			
 		}else{
 		
-			if( isset($_REQUEST['codigo']) ){
+			if( isset($_GET['codigo']) ){
 				$this->buscarProdutoPorCodigo();
 			}
 
-			if( isset($_REQUEST['descricaoProd']) ){
+			if( isset($_GET['descricaoProd']) ){
 				$this->buscarProdutoPorDesc();
 				//$this->buscarProdutoPorCodigo();
 			}
-			
-			$c = new CategoriaDAO();
-			$this->setCategoria($c->selectDados());
-			
-			$f = new FornecedorDAO();
-			$this->setFornecedor($f->selectDados());
-			
-			$u = new UnidadeDAO();
-			$this->setUnidade($u->selectDados());
 			
 			require_once (WWW_ROOT.DS.'view\/'.$this->pag.'.php');
 		}
@@ -62,6 +67,7 @@ class ProdutoCTRL {
 	private function salvarProduto(){
 	
 		$produto = new ProdutoDAO();
+		
 		$produto->setStatus(trim($_POST['statusProdudo']));
 		$produto->setUsuarioCadastro(trim($_SESSION['usuario-id']));
 		
@@ -77,15 +83,21 @@ class ProdutoCTRL {
 		$produto->setEstoqueMinimo(trim($_POST['estoqueMinimo']));
 		$produto->setEstoqueMaximo(trim($_POST['estoqueMaximo']));
 		
-		$this->verificarProduto($produto);
-		$retorno = $produto->salvarProduto();
+		if( isset($_POST['idProduto']) && $_POST['idProduto'] > 0 ){
+			$produto->setIdProduto($_POST['idProduto']);
+			$retorno = $produto->atualizarProduto();
+		}else{
+			$this->verificarProduto($produto);
+			$retorno = $produto->salvarProduto();
+		}
 		
 		if( $retorno == 1 ){
 			$this->setMsg("Produto cadastrado com sucesso!");
 			unset($produto);
 			unset($fornecedor);
 			echo '<script>alert("Produto cadastrado com sucesso!")</script>';
-			return header('Location: index.php?cod=novo-produto'); //abre novo-produto
+			//return header('Location: index.php?cod=novo-produto'); //abre novo-produto
+			return header('Location: index.php?cod=estoque'); //abre comprar-produto
 			exit();
 			//require_once (WWW_ROOT.DS.'view\/'.$this->pag.'.php');  -- usar para mostrar mensagem de sucesso
 		}else{
@@ -121,15 +133,21 @@ class ProdutoCTRL {
 		$produto = new ProdutoDAO();
 		$res = array();
 		
-		if( isset($_REQUEST['codigo']) && trim($_REQUEST['codigo']) != '' ){
-			$produto->setCodigoBarras(trim($_REQUEST['codigo']));
+		if( isset($_GET['codigo']) && trim($_GET['codigo']) != '' ){
+			$produto->setCodigoBarras(trim($_GET['codigo']));
 			$res = $produto->selectDadosEnt();
-		}else if( isset($_REQUEST['descricaoProd']) && trim($_REQUEST['descricaoProd']) ){
-			$produto->setDescricao(utf8_decode($_REQUEST['descricaoProd']));
+		}else if( isset($_GET['descricaoProd']) && trim($_GET['descricaoProd']) ){
+			$produto->setDescricao(utf8_decode($_GET['descricaoProd']));
 			$res = $produto->selectDados();
 			
 		}
 		
+		if( isset($_GET['id_produto']) ){
+			
+			$produto->setIdProduto(trim($_GET['id_produto']));
+			return $this->produto = $produto->selectObjProd();
+			
+		}
 		
 		if( count($res) > 0 ){
 			foreach( $res as $key => $row ) {
@@ -222,6 +240,14 @@ class ProdutoCTRL {
 	
 	public function setUnidade($unidade){
 		$this->unidade = $unidade;
+	}
+	
+	public function getProduto(){
+		return $this->produto;
+	}
+	
+	public function setProduto($produto){
+		$this->produto = $produto;
 	}
 	
 }
